@@ -81,3 +81,27 @@ def update_requirement_status(
     connection.commit()
     cursor.close()
     connection.close()
+
+
+def delete_requirement(requirement_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            DELETE FROM requirements
+            WHERE id = %s
+            """,
+            (requirement_id,)
+        )
+
+        connection.commit()
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        cursor.close()
+        connection.close()

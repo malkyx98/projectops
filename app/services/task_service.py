@@ -101,3 +101,27 @@ def update_task_status(
     connection.commit()
     cursor.close()
     connection.close()
+
+
+def delete_task(task_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            DELETE FROM tasks
+            WHERE id = %s
+            """,
+            (task_id,)
+        )
+
+        connection.commit()
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        cursor.close()
+        connection.close()
