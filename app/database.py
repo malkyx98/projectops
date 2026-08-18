@@ -1,5 +1,6 @@
 import os
 import psycopg2
+from psycopg2.extras import RealDictCursor
 import streamlit as st
 
 
@@ -12,7 +13,10 @@ def get_connection():
         except Exception:
             raise RuntimeError("SUPABASE_DB_URL is not configured.")
 
-    return psycopg2.connect(database_url)
+    return psycopg2.connect(
+        database_url,
+        cursor_factory=RealDictCursor
+    )
 
 
 def initialize_database():
