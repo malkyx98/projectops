@@ -5,17 +5,21 @@ from database import get_connection
 
 def get_tasks(project_id):
     connection = get_connection()
+    cursor = connection.cursor()
 
-    rows = connection.execute(
+    cursor.execute(
         """
         SELECT *
         FROM tasks
-        WHERE project_id = ?
+        WHERE project_id = %s
         ORDER BY id DESC
         """,
         (project_id,)
-    ).fetchall()
+    )
 
+    rows = cursor.fetchall()
+
+    cursor.close()
     connection.close()
 
     return rows
@@ -29,6 +33,7 @@ def add_task(
     status
 ):
     connection = get_connection()
+    cursor = connection.cursor()
 
     completed_at = None
 
@@ -37,7 +42,7 @@ def add_task(
             timespec="seconds"
         )
 
-    connection.execute(
+    cursor.execute(
         """
         INSERT INTO tasks
         (
@@ -48,7 +53,7 @@ def add_task(
             status,
             completed_at
         )
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s)
         """,
         (
             project_id,
@@ -61,6 +66,7 @@ def add_task(
     )
 
     connection.commit()
+    cursor.close()
     connection.close()
 
 
@@ -69,6 +75,7 @@ def update_task_status(
     status
 ):
     connection = get_connection()
+    cursor = connection.cursor()
 
     completed_at = None
 
@@ -77,12 +84,12 @@ def update_task_status(
             timespec="seconds"
         )
 
-    connection.execute(
+    cursor.execute(
         """
         UPDATE tasks
-        SET status = ?,
-            completed_at = ?
-        WHERE id = ?
+        SET status = %s,
+            completed_at = %s
+        WHERE id = %s
         """,
         (
             status,
@@ -92,4 +99,5 @@ def update_task_status(
     )
 
     connection.commit()
+    cursor.close()
     connection.close()
